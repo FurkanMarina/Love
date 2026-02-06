@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>❤️</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #fff;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .message {
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #ff2d55;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: 1s;
+      padding: 0 15px;
+    }
+
+    .message.show {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+
+    .boy {
+      position: absolute;
+      left: 20px;
+      bottom: 70px;
+      width: 120px;
+      height: 120px;
+    }
+
+    .boy .head {
+      width: 80px;
+      height: 80px;
+      border: 4px solid #000;
+      border-radius: 50%;
+      position: absolute;
+      left: 20px;
+      top: 0;
+    }
+
+    .boy .eye {
+      width: 8px;
+      height: 8px;
+      background: #000;
+      border-radius: 50%;
+      position: absolute;
+      top: 28px;
+    }
+
+    .boy .eye.left { left: 22px; }
+    .boy .eye.right { right: 22px; }
+
+    .boy .mouth {
+      width: 18px;
+      height: 10px;
+      border-bottom: 4px solid #000;
+      border-radius: 0 0 20px 20px;
+      position: absolute;
+      left: 31px;
+      top: 45px;
+    }
+
+    .boy .blush {
+      width: 12px;
+      height: 8px;
+      background: pink;
+      border-radius: 50%;
+      position: absolute;
+      top: 38px;
+      opacity: 0.8;
+    }
+
+    .boy .blush.left { left: 8px; }
+    .boy .blush.right { right: 8px; }
+
+    .boy .body {
+      width: 80px;
+      height: 50px;
+      border: 4px solid #000;
+      border-top: none;
+      border-radius: 0 0 25px 25px;
+      position: absolute;
+      left: 20px;
+      top: 70px;
+    }
+
+    .boy .arm {
+      width: 45px;
+      height: 8px;
+      background: #000;
+      position: absolute;
+      top: 88px;
+      left: 70px;
+      transform-origin: left center;
+      transform: rotate(-20deg);
+      border-radius: 10px;
+    }
+
+    .biu {
+      position: absolute;
+      left: 135px;
+      bottom: 140px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #000;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.8s;
+    }
+
+    .biu.show {
+      opacity: 1;
+      transform: translateY(0px);
+    }
+
+    .mini-heart {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #ff2d55;
+      transform: rotate(45deg);
+      border-radius: 4px;
+      opacity: 0;
+      transition: transform 1.2s ease, left 1.2s ease, top 1.2s ease, opacity 1.2s;
+    }
+
+    .mini-heart::before,
+    .mini-heart::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #ff2d55;
+      border-radius: 50%;
+    }
+
+    .mini-heart::before {
+      top: -9px;
+      left: 0;
+    }
+
+    .mini-heart::after {
+      left: -9px;
+      top: 0;
+    }
+
+    .tap {
+      position: absolute;
+      bottom: 25px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      opacity: 0.8;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="scene">
+    <div class="message" id="message">Senin için ❤️</div>
+
+    <div class="boy">
+      <div class="head">
+        <div class="eye left eye"></div>
+        <div class="eye right eye"></div>
+        <div class="mouth"></div>
+        <div class="blush left blush"></div>
+        <div class="blush right blush"></div>
+      </div>
+      <div class="body"></div>
+      <div class="arm"></div>
+    </div>
+
+    <div class="biu" id="biu">biu 💘</div>
+
+    <div class="tap">Dokununca tekrar başlar</div>
+  </div>
+
+  <script>
+    const scene = document.querySelector(".scene");
+    const message = document.getElementById("message");
+    const biu = document.getElementById("biu");
+
+    const heartPoints = [
+      [0, -3],[1, -4],[2, -4],[3, -3],
+      [-1, -4],[-2, -4],[-3, -3],
+      [-4, -2],[-4, -1],[-3, 0],[-2, 1],[-1, 2],[0, 3],[1, 2],[2, 1],[3, 0],[4, -1],[4, -2],
+      [-2, 0],[-1, 1],[0, 2],[1, 1],[2, 0],
+      [-3, -1],[-2, -2],[-1, -2],[0, -1],[1, -2],[2, -2],[3, -1]
+    ];
+
+    let hearts = [];
+
+    function clearHearts() {
+      hearts.forEach(h => h.remove());
+      hearts = [];
+    }
+
+    function createHearts() {
+      clearHearts();
+
+      const centerX = window.innerWidth * 0.65;
+      const centerY = window.innerHeight * 0.42;
+      const scale = Math.min(window.innerWidth, window.innerHeight) / 12;
+
+      heartPoints.forEach((p, i) => {
+        const heart = document.createElement("div");
+        heart.className = "mini-heart";
+
+        // başlangıç pozisyonu (soldan fırlıyor gibi)
+        const startX = 140 + Math.random() * 80;
+        const startY = window.innerHeight - 180 + Math.random() * 80;
+
+        heart.style.left = startX + "px";
+        heart.style.top = startY + "px";
+
+        scene.appendChild(heart);
+        hearts.push(heart);
+
+        setTimeout(() => {
+          heart.style.opacity = 1;
+          heart.style.left = (centerX + p[0] * scale) + "px";
+          heart.style.top = (centerY + p[1] * scale) + "px";
+          heart.style.transform = "rotate(45deg) scale(1)";
+        }, 200 + i * 70);
+      });
+    }
+
+    function startAnimation() {
+      message.classList.remove("show");
+      biu.classList.remove("show");
+      clearHearts();
+
+      setTimeout(() => {
+        biu.classList.add("show");
+      }, 500);
+
+      setTimeout(() => {
+        createHearts();
+      }, 800);
+
+      setTimeout(() => {
+        message.classList.add("show");
+      }, 3000);
+    }
+
+    startAnimation();
+
+    // ekrana dokununca tekrar başlat
+    document.body.addEventListener("click", startAnimation);
+    document.body.addEventListener("touchstart", startAnimation);
+  </script>
+</body>
+</html>
